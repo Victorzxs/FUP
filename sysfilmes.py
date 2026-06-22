@@ -1,11 +1,11 @@
 #from IPython.display import clear_output
 import os
 
-
 def voltar_menu():
     print("\n[**Tecle enter para voltar ao Menu Principal**]")
     if input(""):
         return
+
 
 def simplifica_titulo(titulo):
     consoantes = "bcdfghjklmnpqrstvwxyz"
@@ -26,9 +26,9 @@ def simplifica_titulo(titulo):
                 titulo_simplificado += a[0]
             elif letra in e:
                 titulo_simplificado += e[0]
-            elif letra in e:
+            elif letra in i:
                 titulo_simplificado += i[0]
-            elif letra in e:
+            elif letra in o:
                 titulo_simplificado += o[0]
             else:
                 titulo_simplificado += u[0]
@@ -56,7 +56,8 @@ def mostra_menu(total):
     if opcao.isdigit() and opcao in "123456789":
         return int(opcao)
     else:
-        print("\nOpção inválida. Tecle enter para repetir!")
+        print("\nOpção inválida.")
+        voltar_menu()
 
 
 
@@ -114,7 +115,6 @@ def lista_todos(filmes):
     print("*********************************")
     for filme in filmes:
         mostra_filme(filme)
-    
 
 
 def mostra_filme(filme):
@@ -168,7 +168,7 @@ def consulta_titulo(filmes):
 
     encontrado = False
     for filme in filmes:
-        if busca_titulo(titulo, filme):
+        if busca_titulo(titulo, filme, 2):
             mostra_filme(filme)
             encontrado = True
 
@@ -176,11 +176,13 @@ def consulta_titulo(filmes):
         print("\nFilme não encontrado!")
     
 
-def busca_titulo(titulo,filme):
-    if simplifica_titulo(filme["titulo"]) == simplifica_titulo(titulo): 
-        return filme
-    else: 
-        return
+def busca_titulo(titulo,filme,modo):
+    if modo == 1:
+        if simplifica_titulo(filme["titulo"]) == simplifica_titulo(titulo): 
+            return filme
+    elif modo == 2:
+        if simplifica_titulo(titulo) in simplifica_titulo(filme["titulo"]): 
+            return filme
 
 # avalia filmes
 
@@ -195,19 +197,26 @@ def avalia_filme(filmes, user, dados):
 
     encontrado = False
     for filme in filmes:
-        if busca_titulo(titulo, filme):
+        if busca_titulo(titulo, filme, 1):
             if user:
                 while True:
-                    estrelas = float(input("\nQuantas estrelas você atribui a esse filme? (1 a 5): "))
+                    estrelas = float(input(f"\nQuantas estrelas você atribui ao filme {filme["titulo"]}? (1 a 5): "))
                     if estrelas <= 5 and estrelas >= 0:
                         break
                     else:
                         print("Número inválido. Tente novamente.")
             else:
                 estrelas = float(dados[1].strip())
+
             filme["num_avaliacoes"] += 1
             filme["estrelas"] = round((filme["estrelas"]*(filme["num_avaliacoes"]-1)+estrelas)/filme["num_avaliacoes"],1)
+
+            if user:
+                atualiza_avaliacoes(filme["titulo"], estrelas)
+                print("\nAvaliação efetuada com sucesso :)")
+
             encontrado = True
+            break
 
     if not encontrado:
         print("\nFilme não encontrado!")
@@ -229,7 +238,7 @@ def carrega_filmes(filmes):
                 continue
             else:
                 dados = linha.split(",")
-                bd_filmes.append(cria_filme(False,dados,bd_filmes))
+                filmes.append(cria_filme(False,dados,bd_filmes))
         print("\nFilmes carregados com sucesso!")
     else:
         print("Arquivo não encontrado!")
@@ -251,8 +260,7 @@ def carrega_avaliacoes(filmes):
                 continue
             else:
                 dados = linha.split(",")
-                print(dados)
-                avalia_filme(bd_filmes,False,dados)
+                avalia_filme(filmes,False,dados)
         print("\nAvaliações carregadas com sucesso!")
     else:
         print("Arquivo não encontrado!")
@@ -276,14 +284,9 @@ def atualiza_filmes(filmes):
 
 # atualiza avaliações
 
-def  atualiza_avaliacoes(filmes):
-    conteudo_lista = []
-    with open(f"arquivos/avaliacoes.csv","r+",encoding="utf-8") as arquivo_aberto:
-        conteudo = arquivo_aberto.readlines()
-    for linha in conteudo:
-        dados = linha.split(",")
-        avalia_filme(bd_filmes,False,dados)
-
+def  atualiza_avaliacoes(titulo, estrelas):
+    with open(f"arquivos/avaliacoes.csv","a",encoding="utf-8") as arquivo_aberto:
+        arquivo_aberto.write(f"{titulo},{estrelas}\n")
 
 # programa princial
 
@@ -299,30 +302,45 @@ while True:
         atualiza_filmes(bd_filmes)
 
     elif opcao == 2:
-        avalia_filme(bd_filmes, True, None)
+        if not bd_filmes:
+            print("\nNenhum filme adicionado!!")
+        else:
+            avalia_filme(bd_filmes, True, None)
 
     elif opcao == 3:
-        consulta_titulo(bd_filmes)
+        if not bd_filmes:
+            print("\nNenhum filme adicionado!!")
+        else:
+            consulta_titulo(bd_filmes)
 
     elif opcao == 4:
-        genero = input("\nDigite o gênero desejado: ")
+        if not bd_filmes:
+            print("\nNenhum filme adicionado!!")
+        else:
+            genero = input("\nDigite o gênero desejado: ")
 
-        os.system('cls' if os.name == 'nt' else 'clear')
-        lista_genero(genero, bd_filmes)
+            os.system('cls' if os.name == 'nt' else 'clear')
+            lista_genero(genero, bd_filmes)
 
     elif opcao == 5:
-        while True:
-            estrelas = float(input("\nDigite o número de estrelas desejado: "))
-            if estrelas <= 5 and estrelas >= 0:
-                break
-            else:
-                print("Número inválido. Tente novamente.")
+        if not bd_filmes:
+            print("\nNenhum filme adicionado!!")
+        else:
+            while True:
+                estrelas = float(input("\nDigite o número de estrelas desejado: "))
+                if estrelas <= 5 and estrelas >= 0:
+                    break
+                else:
+                    print("Número inválido. Tente novamente.")
 
-        os.system('cls' if os.name == 'nt' else 'clear')
-        lista_estrelas(estrelas, bd_filmes)
+            os.system('cls' if os.name == 'nt' else 'clear')
+            lista_estrelas(estrelas, bd_filmes)
 
     elif opcao == 6:
-        lista_todos(bd_filmes)
+        if not bd_filmes:
+            print("\nNenhum filme adicionado!!")
+        else:
+            lista_todos(bd_filmes)
 
     elif opcao == 7:
         carrega_filmes(bd_filmes)
