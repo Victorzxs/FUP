@@ -1,14 +1,25 @@
+"""
+Discente: João Victor Mendes Assunção
+Matricula: 600126
+"""
+
 #apenas importei o OS para limpar o console pois não consegui importa o IPython.display.
 import os
 
+"""
+função criada para o programa não 'fechar as abas' de forma imediata.
+"""
 def voltar_menu():
     print("\n[**Tecle enter para voltar ao Menu Principal**]")
     if input(""):
         return
 
-#função extra criada para permitir fazer comparações mais flexiveis.
+"""
+função extra criada para permitir fazer comparações mais flexiveis, ela recebe uma 
+string qualquer e a retorna sem acentos e espaços.
+"""
 def simplifica_titulo(titulo):
-    consoantes = "bcdfghjklmnpqrstvwxyz"
+    consoantes = "bcdfghjklmnpqrstvwxyz0123456789"
     a = "aáàâãä"
     e = "eéèêë"
     i = "iíìîï"
@@ -38,8 +49,10 @@ def simplifica_titulo(titulo):
 
     return titulo_simplificado
 
-# fazendo o menu
-
+"""
+Recebe o número total de filmes cadastrados e o imprime em um menu estatico 
+que contem todas as opções disponiveis para o usuario.
+"""
 def mostra_menu(total):
     print("*********** SysFilmes ***********")
     print(f"******* Existem: {total} filmes *******")
@@ -181,7 +194,9 @@ def cria_filme(user,dados,filmes):
     return filme
 
 
-# Recebe um filme do banco de filmes e envia para a função mostra_filme
+"""
+Recebe uma lista de filmes e para cada, os envia a função mostra_filme.
+"""
 def lista_todos(filmes):
     print("*********** SysFilmes ***********")
     print("******** Listando Filmes ********")
@@ -189,7 +204,9 @@ def lista_todos(filmes):
     for filme in filmes:
         mostra_filme(filme)
 
-# imprime na tela as informações sobre cada filme no layout visivel abaixo
+"""
+imprime na tela as informações sobre cada filme no layout visivel abaixo
+"""
 def mostra_filme(filme):
     print("\n")
     print(f"| Título: {filme["titulo"]}                       ")
@@ -200,9 +217,9 @@ def mostra_filme(filme):
 
 
 """
-Recebe um filme do banco de filmes e verifica se o gênero do filme é igual ao digitado pelo úsuario 
-e novamente eu usei a função simplifica_titulo para o que ela não foi pensada inicialmente, mas isso
-não é relevante.
+Recebe uma lista de filmes e verifica se o gênero do filme é igual ao digitado pelo úsuario. 
+Novamente eu usei a função simplifica_titulo para o que ela não foi pensada inicialmente, mas isso
+não é relevante. 
 """
 def lista_genero(genero, filmes):
     print("*********** SysFilmes ***********")
